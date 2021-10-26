@@ -1,7 +1,9 @@
 #ifndef ANOMALY_DETECTION_UTIL_H
 #define ANOMALY_DETECTION_UTIL_H
 
-// returns the variance of X and Y
+//return the expected value of X
+float expectedValue(float *x, int size);
+// returns the variance of X
 float var(float* x, int size);
 // returns the covariance of X and Y
 float cov(float* x, float* y, int size);
@@ -23,7 +25,7 @@ public:
 class Point {
 public:
     float x,y;
-    Point(float x, float y):x(x),y(x){}
+    Point(float x, float y):x(x),y(y){}
 };
 // performs a linear regression and return s the line equation
 Line linear_reg(Point** points, int size);

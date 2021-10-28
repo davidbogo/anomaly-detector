@@ -84,7 +84,41 @@ Line linear_reg(Point **points, int size)
 }
 
 // returns the deviation between point p and the line equation of the points
-float dev(Point p, Point **points, int size);
+float dev(Point p, Point **points, int size)
+{
+	Line theLineFromThePoints = linear_reg(points, size);
+	if (theLineFromThePoints.f(p.x) == p.y)
+	{
+		return 0;
+	} else
+		{
+			if ((theLineFromThePoints.f(p.x) - p.y) > 0)
+			{
+				return (theLineFromThePoints.f(p.x) - p.y);
+			}
+			else
+			{
+				return (p.y - (theLineFromThePoints.f(p.x)));
+			}
+		}
+}
 
 // returns the deviation between point p and the line
-float dev(Point p, Line l);
+float dev(Point p, Line l)
+{
+	if (l.f(p.x) == p.y)
+	{
+		return 0;
+	}
+	else
+	{
+		if ((l.f(p.x) - p.y) > 0)
+		{
+			return (l.f(p.x) - p.y);
+		}
+		else
+		{
+			return (p.y - (l.f(p.x)));
+		}
+	}
+}

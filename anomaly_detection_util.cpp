@@ -61,7 +61,7 @@ static float *from_point_to_y(Point **points, int size)
 //we calculate here the avarages of the x and y of the points
 static float avarage_calculator(float *vals, int size)
 {
-    float sum;
+    float sum = 0;
     for (int i = 0; i < size; i++) {
         sum += vals[i];
     }

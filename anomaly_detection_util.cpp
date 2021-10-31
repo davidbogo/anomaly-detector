@@ -2,6 +2,15 @@
 #include "anomaly_detection_util.h"
 #include "math.h"
 
+
+float expectedValue(float *x, int size) {
+	float sum = 0;
+	for (int i = 1; i <= size; ++i) {
+		sum = sum + x[i];
+	}
+	return sum / (float)size;
+}
+
 float var(float *x, int size) {
     float var = 0;
     for (int i = 1; i <= size; ++i) {
@@ -10,14 +19,6 @@ float var(float *x, int size) {
     var = var / float(size);
     var = var - pow(expectedValue(x, size), 2);
     return var;
-}
-
-float expectedValue(float *x, int size) {
-    float sum = 0;
-    for (int i = 1; i <= size; ++i) {
-        sum = sum + x[i];
-    }
-    return sum / (float) size;
 }
 
 float cov(float *x, float *y, int size) {

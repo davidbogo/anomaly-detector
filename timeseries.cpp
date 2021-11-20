@@ -8,26 +8,29 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+#include <vector>
+#include <istream>
+#include <string>
+#include <string.h>
 
 /*
  * This class contain the data from the file
  */
 TimeSeries::TimeSeries(const char *CSVfileName) {
     //initialize the map
-    this->matrix = new map<string, vector<float>>;
     setName(CSVfileName);
     //extract the data from the file.
-    readCSVFile(CSVfileName);
+    loadDataFromCSVFile(CSVfileName);
 }
 
 void TimeSeries::setName(const char *name) {
     char *fileName = new char[strlen(name) + 1];
     strcpy(fileName, name);
-    this->csvName = fileName;
+	csvName = fileName;
 }
 
 const char *TimeSeries::getName() {
-    return this->csvName;
+    return csvName;
 }
 
 
@@ -38,12 +41,13 @@ void TimeSeries::loadDataFromCSVFile(const char *CSVfileName) {
     }
     //in this vector I save all the lines.
     vector<string> values;
+	string line;
     //getting the first line from the file (the names of the features).
     getline(CSVfile, line);
     //creating vector with the name of the features.
-    this -> featuresNames = dataSeparation(line, ',');
+    featuresNames = dataSeparation(line, ',');
 
-    //getting all tje lines with values.
+    //getting all the lines with values.
     while (getline(CSVfile, line)) {
         values = dataSeparation(line, ',');
         // add the date to the map
@@ -53,9 +57,9 @@ void TimeSeries::loadDataFromCSVFile(const char *CSVfileName) {
 }
 
 void TimeSeries::add(string line, vector<string> vec) {
-    for (int i = 0; i < featuresNames.size(); ++i) {
+    for (size_t i = 0; i < featuresNames.size(); ++i) {
         //pushing this value to its suitable vector according to the name of the feature.
-        matrix[feature_name[i]].push_back(stof(vec[i]));
+        matrix[featuresNames[i]].push_back(stof(vec[i]));
     }
 }
 
@@ -71,18 +75,17 @@ vector<string> TimeSeries::dataSeparation(string line, char delim) {
 }
 
 vector<float> TimeSeries::getValues(string str) const {
-    return getDataTable()[str];
+    return getMatrix()[str];
 }
 
 const vector <string> TimeSeries::getFeatureNames() const{
     return this->featuresNames;
 }
 
-map<string, vector<float>> TimeSeries::getMatrix() const { {
+map<string, vector<float>> TimeSeries::getMatrix() const {
         return matrix;
 }
 
-TimeSeries::~TimeSeries(){
-        delete this->csvName
+TimeSeries::~TimeSeries() {
+	delete this->csvName;
 }
-;

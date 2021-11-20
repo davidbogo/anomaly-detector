@@ -27,11 +27,14 @@ public:
     float x,y;
     Point(float x, float y):x(x),y(y){}
 };
+
 // performs a linear regression and return s the line equation
 Line linear_reg(Point** points, int size);
+
 // returns the deviation between point p and the line equation of the points
-float dev(Point p,Point** points, int size);
+float dev(Point p, Point** points, int size);
+
 // returns the deviation between point p and the line
-float dev(Point p,Line l);
+float dev(Point p, Line l);
 
 #endif // ANOMALY_DETECTION_UTIL_H

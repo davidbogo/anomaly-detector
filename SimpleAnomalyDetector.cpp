@@ -1,6 +1,7 @@
 
 #include "SimpleAnomalyDetector.h"
 #define THRESHOLD 0.9
+#define NO_FALSE_ALARMS_THRESHOLD 1.1
 
 SimpleAnomalyDetector::SimpleAnomalyDetector() {
 	// TODO Auto-generated constructor stub
@@ -11,6 +12,15 @@ SimpleAnomalyDetector::~SimpleAnomalyDetector() {
 	// TODO Auto-generated destructor stub
 }
 
+bool SimpleAnomalyDetector::noPreviousCorrelation(const string &feat1, const string &feat2) {
+	//scan the vector of correlated objects.
+	for (auto iter = cf.begin(); iter != cf.end(); ++iter) {
+		if (iter->feature1 == feat2 && iter->feature2 == feat1) {
+			return false;
+		}
+	}
+	return true;
+}
 
 void SimpleAnomalyDetector::learnNormal(const TimeSeries& ts){
 	for (auto const& it1 : ts.getFeatureNames()) {
@@ -25,11 +35,11 @@ void SimpleAnomalyDetector::learnNormal(const TimeSeries& ts){
 				auto value2 = ts.getValues(it2);
 				float* x = new float[value1.size()];
 				float* y = new float[value2.size()];
-				for (int i = 0; i < value1.size(); ++i) {
+				for (size_t i = 0; i < value1.size(); ++i) {
 					x[i] = value1[i];
 					y[i] = value2[i];
 				}
-				float p = fabs(pearson(x, y, value1.size()));
+				float p = fabs(pearson(x, y, (int)value1.size()));
 				//if the pearson value is at least 0.9
 				// and the pearson bigger then the last max correlation which checked.
 				if (p >= THRESHOLD && p > curCor) {
@@ -40,39 +50,41 @@ void SimpleAnomalyDetector::learnNormal(const TimeSeries& ts){
 				delete [] y;
 			}
 		}
-		// if there is a value in max
-		if (curCor > 0) {
+		// if there is a value in max and no previous correlation between feat1 and 2
+		if (curCor > 0 && noPreviousCorrelation(feature1, feature2)) {
 			// fill correlatedfeatures struct.
 			correlatedFeatures corrF;
 			corrF.feature1 = feature1;
 			corrF.feature2 = feature2;
 			corrF.corrlation = curCor;
 			corrF.threshold = 0;
-			int size = ts.getValues(it1).size;
+			size_t size = ts.getValues(it1).size();
 			float* xPoints = new float[size];
 			float* yPoints = new float[size];
 			Point** totalPoints = new Point*[size];
 			//create arrays to convert them to points.
-			for (int j = 0; j < size; ++j) {
+			for (size_t j = 0; j < size; ++j) {
 				xPoints[j] = ts.getValues(corrF.feature1)[j];
 				yPoints[j] = ts.getValues(corrF.feature2)[j];
 				totalPoints[j] = new Point(xPoints[j], yPoints[j]);
 			}
 			//create the line regression for this struct.
-			corrF.lin_reg = linear_reg(totalPoints, size);
+			corrF.lin_reg = linear_reg(totalPoints, (int)size);
 			// find the maximum deviation from the line.
-			for (int i = 0; i < size; ++i) {
-				Point p1(xPoints[i], yPoints[i]);
-				float dev1 = dev(p1, corrF.lin_reg);
-				if (dev1 > corrF.threshold) {
-					corrF.threshold = dev1 * (float)THRESHOLD;
+			float maxDeviation = 0.0;
+			for (size_t i = 0; i < size; ++i) {
+				// Point p1(xPoints[i], yPoints[i]);
+				float dev1 = dev(*totalPoints[i], corrF.lin_reg);
+				if (dev1 > maxDeviation) {
+					maxDeviation = dev1;
 				}
 			}
+			corrF.threshold = maxDeviation * (float)NO_FALSE_ALARMS_THRESHOLD;
 			//push the object that has made to threshold vector.
-			this->cf.push_back(corrF);
-			for (int j = 0; j < size; ++j)
+			cf.push_back(corrF);
+			for (size_t j = 0; j < size; ++j)
 			{
-				delete[] totalPoints[j];
+				delete totalPoints[j];
 			}
 			delete[] totalPoints;
 			delete[] yPoints;
@@ -85,10 +97,10 @@ vector<AnomalyReport> SimpleAnomalyDetector::detect(const TimeSeries& ts){
 	vector<AnomalyReport> anomalyArray;
 	for (correlatedFeatures corrF : cf)
 	{
-		int size = ts.getValues.size;
 		string feat1 = corrF.feature1;
 		string feat2 = corrF.feature2;
-		for (int i = 0; i < size; i++)
+		size_t size = ts.getValues(feat1).size();
+		for (size_t i = 0; i < size; i++)
 		{
 			// we now get the dev of every point and check whether it's an anomaly!
 			Point currPoint(ts.getValues(feat1)[i], ts.getValues(feat2)[i]);
@@ -96,7 +108,7 @@ vector<AnomalyReport> SimpleAnomalyDetector::detect(const TimeSeries& ts){
 			if (currPointDev > corrF.threshold)
 			{
 				//adding the point to the anomaly array via a new report
-				AnomalyReport anomalyReport(feat1 + "-" + feat2, i + 1);
+				AnomalyReport anomalyReport(feat1 + "-" + feat2, (long)i + 1);
 				anomalyArray.push_back(anomalyReport);
 			}
 		}

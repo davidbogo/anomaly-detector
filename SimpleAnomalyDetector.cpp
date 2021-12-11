@@ -108,7 +108,7 @@ vector<AnomalyReport> SimpleAnomalyDetector::detect(const TimeSeries& ts){
 			if (currPointDev > corrF.threshold)
 			{
 				//adding the point to the anomaly array via a new report
-				AnomalyReport anomalyReport(feat1 + "-" + feat2, (long)i + 1);
+				AnomalyReport anomalyReport(feat1 + "-" + feat2, (long)(i + 1));
 				anomalyArray.push_back(anomalyReport);
 			}
 		}

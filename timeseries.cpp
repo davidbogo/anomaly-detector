@@ -87,5 +87,5 @@ map<string, vector<float>> TimeSeries::getMatrix() const {
 }
 
 TimeSeries::~TimeSeries() {
-	delete this->csvName;
+	delete csvName;
 }

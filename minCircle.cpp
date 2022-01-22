@@ -9,7 +9,6 @@ using namespace std;
 
 // Defining infinity
 const float INF = (float)1e18;
-map<int, Circle> minCircle;
 
 // Function to return the euclidean distance
 // between two points
@@ -108,14 +107,6 @@ Circle min_circle_trivial(vector<Point>& P)
 	return circle_from(P[0], P[1], P[2]);
 }
 
-bool pointAboveTheOther(const Point& first, const Point& second) {
-	return (first.y > second.y);
-}
-
-bool pointComparator(const Point& first, const Point& second) {
-	return (first.x == second.x && first.y == second.y);
-}
-
 // Returns the MEC using Welzl's algorithm
 // Takes a set of input points P and a set R
 // points on the circle boundary.
@@ -124,7 +115,6 @@ bool pointComparator(const Point& first, const Point& second) {
 Circle welzl_helper(vector<Point>& P,
 	vector<Point> R, size_t n)
 {
-	Circle minimumCircle(Point((float)0, (float)0), (float)0);
 	// Base case when all points processed or |R| = 3
 	if (n == 0 || R.size() == 3) {
 		return min_circle_trivial(R);
@@ -141,26 +131,18 @@ Circle welzl_helper(vector<Point>& P,
 
 	// Get the MEC circle d from the
 	// set of points P - {p}
-    sort(R.begin(), R.end(), pointAboveTheOther);
-	if (minCircle.find((int)R.size()) == minCircle.end()) {
-		Circle d = welzl_helper(P, R, n - (size_t)1);
+	Circle d = welzl_helper(P, R, n - (size_t)1);
 
-		// If d contains p, return d
-		if (is_inside(d, p)) {
-			return d;
-		}
-
-		// Otherwise, must be on the boundary of the MEC
-		R.push_back(p);
-
-		// Return the MEC for P - {p} and R U {p}
-		minimumCircle = welzl_helper(P, R, n - (size_t)1);
-		minCircle.insert(pair<int, Circle>((int)R.size(), minimumCircle));
+	// If d contains p, return d
+	if (is_inside(d, p)) {
+		return d;
 	}
-	else {
-//		minimumCircle = minCircle[(int)R.size()];
-	}
-	return minimumCircle;
+
+	// Otherwise, must be on the boundary of the MEC
+	R.push_back(p);
+
+	// Return the MEC for P - {p} and R U {p}
+	return welzl_helper(P, R, n - (size_t)1);
 }
 
 Circle findMinCircle(Point **points, size_t size)
@@ -170,7 +152,6 @@ Circle findMinCircle(Point **points, size_t size)
 	for (int i = 0; i < size; i++) {
 		P.push_back(*points[i]);
 	}
-	vector<Point> P_copy = P;
-	random_shuffle(P_copy.begin(), P_copy.end());
-	return welzl_helper(P_copy, {}, size);
+	random_shuffle(P.begin(), P.end());
+	return welzl_helper(P, {}, size);
 }

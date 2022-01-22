@@ -20,15 +20,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="anomaly_detection_util.cpp" />
+    <ClCompile Include="CLI.cpp" />
+    <ClCompile Include="HybridAnomalyDetector.cpp" />
     <ClCompile Include="MainTrain.cpp" />
     <ClCompile Include="minCircle.cpp" />
+    <ClCompile Include="Server.cpp" />
     <ClCompile Include="SimpleAnomalyDetector.cpp" />
     <ClCompile Include="timeseries.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnomalyDetector.h" />
     <ClInclude Include="anomaly_detection_util.h" />
+    <ClInclude Include="CLI.h" />
+    <ClInclude Include="commands.h" />
+    <ClInclude Include="HybridAnomalyDetector.h" />
     <ClInclude Include="minCircle.h" />
+    <ClInclude Include="Server.h" />
     <ClInclude Include="SimpleAnomalyDetector.h" />
     <ClInclude Include="timeseries.h" />
   </ItemGroup>

@@ -46,9 +46,11 @@ void TimeSeries::loadDataFromCSVFile(const char *CSVfileName) {
     getline(CSVfile, line);
     //creating vector with the name of the features.
     featuresNames = dataSeparation(line, ',');
-
     //getting all the lines with values.
     while (getline(CSVfile, line)) {
+		if (strcmp(line.c_str(), "done") == 0) {
+			break;
+		}
         values = dataSeparation(line, ',');
         // add the date to the map
         add(line, values);

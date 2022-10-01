@@ -1,7 +1,7 @@
 /*
  * anomaly_detection_util.cpp
  *
- * Author: Michael Amar & David Bogoslavsky .
+ * Author: David Bogoslavsky
  */
 
 #include "anomaly_detection_util.h"
